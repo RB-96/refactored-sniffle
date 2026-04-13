@@ -31,7 +31,7 @@ class ContentCrew:
     def _pro_llm() -> LLM:
         return LLM(
             model=os.getenv("OPENAI_MODEL"),
-            temperature=0.75,
+            temperature=0.7,
             top_p=0.9,
         )
 
@@ -40,7 +40,7 @@ class ContentCrew:
         return LLM(
             model=os.getenv("OPENAI_MODEL"),
             temperature=0.7,
-            top_p=0.95,
+            top_p=0.9,
         )
 
     @staticmethod

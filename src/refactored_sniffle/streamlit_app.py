@@ -8,7 +8,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 os.environ.setdefault("CREWAI_STORAGE_DIR", str(PROJECT_ROOT / ".crewai"))
 os.environ.setdefault("CREWAI_TRACING_ENABLED", "false")
 
-from refactored_sniffle.main import DEFAULT_MOTION, DebateState, run_debate_session
+from src.refactored_sniffle.main import DEFAULT_MOTION, DebateState, run_debate_session
 
 
 def add_custom_css():

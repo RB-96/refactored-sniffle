@@ -11,7 +11,7 @@ os.environ.setdefault("CREWAI_TRACING_ENABLED", "false")
 
 from crewai.flow import Flow, listen, start
 
-from refactored_sniffle.crews.content_crew.content_crew import ContentCrew
+from src.refactored_sniffle.crews.content_crew.content_crew import ContentCrew
 
 
 DEFAULT_MOTION = "AI should replace traditional exams in higher education."
