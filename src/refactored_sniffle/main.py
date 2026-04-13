@@ -17,8 +17,8 @@ from src.refactored_sniffle.crews.content_crew.content_crew import ContentCrew
 DEFAULT_MOTION = "AI should replace traditional exams in higher education."
 
 
-class DebateState(BaseModel):
-    motion: str = ""
+class DebateResult(BaseModel):
+    """Computed debate outputs."""
     pro_opening: str = ""
     con_opening: str = ""
     pro_rebuttal: str = ""
@@ -27,6 +27,12 @@ class DebateState(BaseModel):
     winner: str = ""
     judge_description: str = ""
     transcript: str = ""
+
+
+class DebateState(BaseModel):
+    """Flow state: motion is the only input, result is built progressively."""
+    motion: str = ""
+    result: DebateResult = DebateResult()
 
 
 def resolve_motion(payload: dict | None = None) -> str:
@@ -68,33 +74,33 @@ def extract_judge_description(verdict: str) -> str:
     return "See the judge scorecard for the full decision."
 
 
-def build_transcript(state: DebateState) -> str:
+def build_transcript(motion: str, result: DebateResult) -> str:
     sections = [
         "# Debate Transcript",
         "",
         "## Motion",
-        state.motion,
+        motion,
         "",
         "## Pro Opening",
-        state.pro_opening or "_No opening generated._",
+        result.pro_opening or "_No opening generated._",
         "",
         "## Con Opening",
-        state.con_opening or "_No opening generated._",
+        result.con_opening or "_No opening generated._",
         "",
         "## Pro Rebuttal",
-        state.pro_rebuttal or "_No rebuttal generated._",
+        result.pro_rebuttal or "_No rebuttal generated._",
         "",
         "## Con Rebuttal",
-        state.con_rebuttal or "_No rebuttal generated._",
+        result.con_rebuttal or "_No rebuttal generated._",
         "",
         "## Judge Scorecard",
-        state.verdict or "_No verdict generated._",
+        result.verdict or "_No verdict generated._",
         "",
         "## Winner",
-        state.winner or "See judge scorecard above.",
+        result.winner or "See judge scorecard above.",
         "",
         "## Judge Description",
-        state.judge_description or "See the judge scorecard for details.",
+        result.judge_description or "See the judge scorecard for details.",
     ]
     return "\n".join(sections).strip() + "\n"
 
@@ -111,21 +117,21 @@ def run_debate_session(motion: str, save_output: bool = True) -> DebateState:
     result = ContentCrew().crew().kickoff(inputs={"motion": motion})
     outputs = list(getattr(result, "tasks_output", []) or [])
 
-    state = DebateState(
-        motion=motion,
+    debate_result = DebateResult(
         pro_opening=_task_output(outputs, 0),
         con_opening=_task_output(outputs, 1),
         pro_rebuttal=_task_output(outputs, 2),
         con_rebuttal=_task_output(outputs, 3),
         verdict=_task_output(outputs, 4) or result.raw,
     )
-    state.winner = extract_winner(state.verdict)
-    state.judge_description = extract_judge_description(state.verdict)
-    state.transcript = build_transcript(state)
+    debate_result.winner = extract_winner(debate_result.verdict)
+    debate_result.judge_description = extract_judge_description(debate_result.verdict)
+    debate_result.transcript = build_transcript(motion, debate_result)
 
     if save_output:
-        save_transcript(state.transcript)
+        save_transcript(debate_result.transcript)
 
+    state = DebateState(motion=motion, result=debate_result)
     return state
 
 
@@ -141,17 +147,18 @@ class DebateFlow(Flow[DebateState]):
     @listen(prepare_motion)
     def run_debate(self):
         print(f"Running debate on: {self.state.motion}")
-        self.state = run_debate_session(self.state.motion, save_output=False)
+        full_state = run_debate_session(self.state.motion, save_output=False)
+        self.state.result = full_state.result
 
         print("Debate complete")
-        return self.state.transcript
+        return self.state.result.transcript
 
     @listen(run_debate)
     def save_debate(self):
         print("Saving debate transcript")
-        output_path = save_transcript(self.state.transcript)
+        output_path = save_transcript(self.state.result.transcript)
         print(f"Debate saved to {output_path.as_posix()}")
-        return self.state.transcript
+        return self.state.result.transcript
 
 
 def kickoff():

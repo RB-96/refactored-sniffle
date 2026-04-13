@@ -8,7 +8,8 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 os.environ.setdefault("CREWAI_STORAGE_DIR", str(PROJECT_ROOT / ".crewai"))
 os.environ.setdefault("CREWAI_TRACING_ENABLED", "false")
 
-from src.refactored_sniffle.main import DEFAULT_MOTION, DebateState, run_debate_session
+from refactored_sniffle.main import DEFAULT_MOTION, DebateState, run_debate_session
+
 
 
 def add_custom_css():
@@ -137,7 +138,7 @@ def render_debate(state: DebateState) -> None:
                 <h3 style='color: #2ecc71; margin-top: 0;'>📢 OPENING STATEMENT</h3>
             </div>
             """, unsafe_allow_html=True)
-            st.markdown(state.pro_opening)
+            st.markdown(state.result.pro_opening)
             st.markdown("")
         
         # Pro rebuttal
@@ -147,7 +148,7 @@ def render_debate(state: DebateState) -> None:
                 <h3 style='color: #2ecc71; margin-top: 0;'>⚔️ REBUTTAL</h3>
             </div>
             """, unsafe_allow_html=True)
-            st.markdown(state.pro_rebuttal)
+            st.markdown(state.result.pro_rebuttal)
 
     # CON SIDE - Right
     with con_col:
@@ -170,7 +171,7 @@ def render_debate(state: DebateState) -> None:
                 <h3 style='color: #e74c3c; margin-top: 0;'>📢 OPENING STATEMENT</h3>
             </div>
             """, unsafe_allow_html=True)
-            st.markdown(state.con_opening)
+            st.markdown(state.result.con_opening)
             st.markdown("")
         
         # Con rebuttal
@@ -180,7 +181,7 @@ def render_debate(state: DebateState) -> None:
                 <h3 style='color: #e74c3c; margin-top: 0;'>⚔️ REBUTTAL</h3>
             </div>
             """, unsafe_allow_html=True)
-            st.markdown(state.con_rebuttal)
+            st.markdown(state.result.con_rebuttal)
 
     # Judge verdict section - full width at bottom
     st.markdown("")
@@ -190,7 +191,7 @@ def render_debate(state: DebateState) -> None:
     """, unsafe_allow_html=True)
     
     # Winner announcement with celebration
-    winner = state.winner if state.winner in {"Pro", "Con"} else "Pending"
+    winner = state.result.winner if state.result.winner in {"Pro", "Con"} else "Pending"
     
     if winner == "Pro":
         st.balloons()
@@ -232,7 +233,7 @@ def render_debate(state: DebateState) -> None:
                 <h3 style='color: #e67e22; margin-top: 0;'>📝 JUDGE'S COMMENTARY</h3>
             </div>
             """, unsafe_allow_html=True)
-            st.markdown(state.judge_description)
+            st.markdown(state.result.judge_description)
     
     st.markdown("")
     
@@ -240,7 +241,7 @@ def render_debate(state: DebateState) -> None:
     col1, col2, col3 = st.columns([0.5, 3, 0.5])
     with col2:
         with st.expander("📊 VIEW DETAILED SCORECARD", expanded=True):
-            st.markdown(state.verdict)
+            st.markdown(state.result.verdict)
     
     st.markdown("")
     st.markdown("")
@@ -248,7 +249,7 @@ def render_debate(state: DebateState) -> None:
     # Download button
     st.download_button(
         "⬇️ 📥 Download Full Transcript",
-        data=state.transcript,
+        data=state.result.transcript,
         file_name="debate.md",
         mime="text/markdown",
         use_container_width=True,
