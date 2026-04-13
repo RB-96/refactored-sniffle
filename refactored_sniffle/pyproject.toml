@@ -1,0 +1,27 @@
+[project]
+name = "refactored_sniffle"
+version = "0.1.0"
+description = "refactored-sniffle using crewAI"
+authors = [{ name = "Raktima Barman", email = "reddish.rad@gmail.com" }]
+requires-python = ">=3.10,<3.14"
+dependencies = [
+    "crewai[anthropic,litellm,tools]==1.14.1",
+    "python-dotenv==1.1.1",
+    "streamlit>=1.56.0",
+]
+
+[project.scripts]
+kickoff = "refactored_sniffle.main:kickoff"
+run_crew = "refactored_sniffle.main:kickoff"
+plot = "refactored_sniffle.main:plot"
+run_with_trigger = "refactored_sniffle.main:run_with_trigger"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.crewai]
+type = "flow"
+
+[tool.uv]
+link-mode = "copy"

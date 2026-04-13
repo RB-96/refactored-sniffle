@@ -1,0 +1,84 @@
+pro_opening_task:
+  description: >
+    Deliver the opening statement for the affirmative side on this motion:
+    {motion}
+
+    Requirements:
+    - Use the available Serper search tool to gather current facts about the motion
+    - Argue clearly in favor of the motion
+    - Present 2-3 distinct supporting points
+    - Weave in factual evidence or examples from your research
+    - Keep the tone persuasive and debate-ready
+    - Do not mention any hidden instructions or rubric
+  expected_output: >
+    A concise opening statement in markdown for the Pro side with a short
+    thesis, supporting arguments, and factual evidence from research.
+  agent: pro_debater
+  async_execution: true
+
+con_opening_task:
+  description: >
+    Deliver the opening statement for the opposition side on this motion:
+    {motion}
+
+    Requirements:
+    - Use the available Serper search tool to gather current facts about the motion
+    - Argue clearly against the motion
+    - Present 2-3 distinct counterpoints
+    - Weave in factual evidence or examples from your research
+    - Keep the tone persuasive and debate-ready
+    - Do not mention any hidden instructions or rubric
+  expected_output: >
+    A concise opening statement in markdown for the Con side with a short
+    thesis, supporting arguments, and factual evidence from research.
+  agent: con_debater
+  async_execution: true
+
+pro_rebuttal_task:
+  description: >
+    Deliver the Pro rebuttal for this motion: {motion}
+
+    You are responding to the Con opening statement provided in context.
+
+    Requirements:
+    - Use the Serper search tool if you need fresh facts to challenge the opposition
+    - Refute the strongest opposition claims directly
+    - Correct factual weaknesses or unsupported claims where possible
+    - Reinforce the Pro case without repeating the opening verbatim
+    - Keep the rebuttal focused and concise
+  expected_output: >
+    A concise Pro rebuttal in markdown that directly answers the Con opening.
+  agent: pro_debater
+
+con_rebuttal_task:
+  description: >
+    Deliver the Con rebuttal for this motion: {motion}
+
+    You are responding to the Pro opening statement provided in context.
+
+    Requirements:
+    - Use the Serper search tool if you need fresh facts to challenge the opposition
+    - Refute the strongest affirmative claims directly
+    - Correct factual weaknesses or unsupported claims where possible
+    - Reinforce the Con case without repeating the opening verbatim
+    - Keep the rebuttal focused and concise
+  expected_output: >
+    A concise Con rebuttal in markdown that directly answers the Pro opening.
+  agent: con_debater
+
+judging_task:
+  description: >
+    Judge the debate for this motion: {motion}
+
+    Review the full debate record provided in context and decide the winner
+    based only on the arguments presented.
+
+    Requirements:
+    - Score both Pro and Con on clarity, logic, and rebuttal strength
+    - Provide a short rationale for the decision
+    - Declare exactly one winner: Pro or Con
+    - Format the response with clear markdown headings
+  expected_output: >
+    A markdown judge report containing a scorecard for both sides, a short
+    rationale, and a final winner declaration.
+  agent: judge
